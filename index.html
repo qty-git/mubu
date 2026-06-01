@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#050607" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>透明物理幕布 · 手势交互</title>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <link rel="stylesheet" href="./style.css?v=20260602-r82-mobile1" />
+</head>
+<body>
+  <div id="versionCorner" class="version-corner"></div>
+  <div id="gestureHud" class="gesture-hud">Hands: 0
+Pinch: 0
+Scale: off</div>
+  <video id="cameraVideo" playsinline muted></video>
+  <div id="startOverlay" class="start">
+    <div class="start-card">
+      <h1>透明物理幕布 <span id="versionBadge" class="version-badge"></span></h1>
+      <p>允许摄像头后，透明幕布模式可用拇指和食指捏住互动；磨砂玻璃模式用手掌擦除清晰区域。手机请使用 Safari/Chrome 并保持 HTTPS 或 localhost。</p>
+      <div id="status" class="status">建议用 HTTPS 或 localhost 打开，手机浏览器才能稳定调用摄像头。</div>
+      <button id="startBtn" class="primary">开始</button>
+    </div>
+  </div>
+
+  <button id="eyeBtn" class="eye" aria-label="隐藏或显示界面">◉</button>
+
+  <div class="debug" id="debug">Hands: waiting</div>
+
+  <div class="panel" aria-label="幕布控制面板">
+    <div class="panel-section">
+      <div class="panel-title">媒体</div>
+      <div class="row">
+        <label class="upload-label" for="mediaInput">上传媒体</label>
+        <input id="mediaInput" type="file" accept="image/*,video/*" multiple />
+        <button id="recordBtn">开始录屏</button>
+      </div>
+      <label class="slider-row">
+        <span>媒体缩放</span>
+        <input id="scaleInput" type="range" min="0.65" max="1.8" step="0.01" value="1" />
+      </label>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">画面</div>
+      <label class="slider-row">
+        <span>幕布大小</span>
+        <input id="curtainSizeInput" type="range" min="0.45" max="1.35" step="0.01" value="1" />
+      </label>
+      <label class="aspect-row">
+        <span>画面比例</span>
+        <select id="aspectSelect">
+          <option value="auto">自动</option>
+          <option value="full">全屏</option>
+          <option value="16:9">16:9</option>
+          <option value="4:3">4:3</option>
+          <option value="3:4">3:4</option>
+          <option value="9:16">9:16</option>
+          <option value="1:1">1:1</option>
+        </select>
+      </label>
+      <label class="aspect-row">
+        <span>显示比例</span>
+        <select id="greenAspectSelect">
+          <option value="inherit">跟随幕布</option>
+          <option value="full">全屏</option>
+          <option value="1:1">1:1</option>
+          <option value="3:4">3:4</option>
+          <option value="9:16">9:16</option>
+          <option value="4:3">4:3</option>
+          <option value="16:9">16:9</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">交互</div>
+      <div class="row mode-row">
+        <button id="coverModeBtn">模式：透明幕布</button>
+        <button id="modeBtn">鼠标抓布</button>
+        <button id="flipBtn">翻转摄像头</button>
+      </div>
+      <div class="row mode-row">
+        <button id="sizeTargetBtn">缩放：选中幕布</button>
+        <button id="greenScreenBtn">绿幕背景：关</button>
+        <button id="frostResetBtn">重新磨砂</button>
+      </div>
+    </div>
+
+    <div class="panel-footer">
+      <button id="debugToggleBtn" class="quiet">调试：关</button>
+    </div>
+  </div>
+
+  <div class="hint">捏合可拉扯透明幕布；握拳可移动幕布或磨砂区域；双手捏合可缩放和平移显示区域。幕布边缘甩到顶部会吸附收起，再从顶部捏住下拉可放下。</div>
+  <script src="./src/config.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/state.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/geometry.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/ui.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/audio.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/media.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/recorder.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/camera.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/hands.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/veilVisuals.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/cloth.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/app.js?v=20260602-r82-mobile1"></script>
+  <script src="./src/gestures.js?v=20260602-r82-mobile1"></script>
+</body>
+</html>
