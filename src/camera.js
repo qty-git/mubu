@@ -8,14 +8,16 @@
       const aspect = resolveStageAspect();
       const portrait = aspect != null && aspect < 1;
       const mobile = isMobileLayout();
-      const idealW = portrait ? (mobile ? 720 : 1080) : (mobile ? 1280 : 1920);
-      const idealH = portrait ? (mobile ? 1280 : 1920) : (mobile ? 720 : 1080);
+      const idealW = mobile ? 1280 : (portrait ? 1080 : 1920);
+      const idealH = mobile ? 720 : (portrait ? 1920 : 1080);
       return {
         audio: false,
         video: {
           facingMode: { ideal: facingMode },
           width: { ideal: idealW },
           height: { ideal: idealH },
+          aspectRatio: { ideal: mobile ? 16 / 9 : (idealW / idealH) },
+          resizeMode: { ideal: "none" },
           frameRate: { ideal: mobile ? 24 : 30, max: mobile ? 30 : 60 }
         }
       };
@@ -32,8 +34,9 @@
           audio: false,
           video: {
             facingMode: facingMode,
-            width: { ideal: 640 },
-            height: { ideal: 960 },
+            width: { ideal: 960 },
+            height: { ideal: 540 },
+            aspectRatio: { ideal: 16 / 9 },
             frameRate: { ideal: 20, max: 30 }
           }
         });
@@ -70,8 +73,18 @@
       // r64: green screen applies only to the curtain/media display region,
       // not to the whole camera background. Keep the real camera background visible.
       if (cameraVideo.readyState >= 2) {
-        ctx.globalAlpha = 0.96;
-        drawCover(cameraVideo, 0, 0, stageW(), stageH(), mirrorCamera);
+        const mobile = isMobileLayout();
+        if (mobile) {
+          ctx.globalAlpha = 0.34;
+          ctx.filter = "blur(16px) saturate(0.82)";
+          drawCover(cameraVideo, 0, 0, stageW(), stageH(), mirrorCamera);
+          ctx.filter = "none";
+          ctx.globalAlpha = 0.98;
+          drawContain(cameraVideo, 0, 0, stageW(), stageH(), mirrorCamera);
+        } else {
+          ctx.globalAlpha = 0.96;
+          drawCover(cameraVideo, 0, 0, stageW(), stageH(), mirrorCamera);
+        }
       } else {
         ctx.fillStyle = "#111418";
         ctx.fillRect(0, 0, stageW(), stageH());

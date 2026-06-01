@@ -457,7 +457,11 @@
     document.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
     document.addEventListener("gesturechange", (e) => e.preventDefault(), { passive: false });
     document.addEventListener("gestureend", (e) => e.preventDefault(), { passive: false });
-    document.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
+    document.addEventListener("touchmove", (e) => {
+      const target = e.target;
+      if (target && target.closest && target.closest(".panel, .start-card, select, input, button, .upload-label")) return;
+      e.preventDefault();
+    }, { passive: false });
     if (window.visualViewport) {
       window.visualViewport.addEventListener("resize", () => scheduleViewportResize(80), { passive: true });
       window.visualViewport.addEventListener("scroll", () => updateViewportVars(), { passive: true });

@@ -93,6 +93,25 @@
       }
       ctx.restore();
     }
+    function drawContain(source, x, y, w, h, mirrored) {
+      const sw = source.videoWidth || source.naturalWidth || source.width || 1;
+      const sh = source.videoHeight || source.naturalHeight || source.height || 1;
+      const scale = Math.min(w / sw, h / sh);
+      const dw = sw * scale;
+      const dh = sh * scale;
+      const dx = x + (w - dw) / 2;
+      const dy = y + (h - dh) / 2;
+      ctx.save();
+      if (mirrored) {
+        const mirrorW = stageW();
+        ctx.translate(mirrorW, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(source, mirrorW - dx - dw, dy, dw, dh);
+      } else {
+        ctx.drawImage(source, dx, dy, dw, dh);
+      }
+      ctx.restore();
+    }
     function mediaReady(el) {
       if (!el) return false;
       if (el instanceof HTMLVideoElement) return el.readyState >= 2;
