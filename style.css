@@ -64,6 +64,62 @@
       pointer-events: none;
     }
 
+    .tutorial {
+      position: fixed;
+      inset: 0;
+      z-index: 18;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(3, 5, 7, 0.64);
+      backdrop-filter: blur(8px);
+      transition: opacity 220ms ease;
+    }
+
+    .tutorial.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .start:not(.hidden) ~ .tutorial {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tutorial-card {
+      width: min(420px, calc(100vw - 32px));
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(10, 13, 16, 0.82);
+      box-shadow: 0 22px 80px rgba(0, 0, 0, 0.42);
+    }
+
+    .tutorial-step {
+      color: rgba(255, 255, 255, 0.52);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tutorial-card h2 {
+      margin: 8px 0 10px;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .tutorial-card p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.65;
+    }
+
+    .tutorial-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
     .start:not(.hidden) ~ .eye,
     .start:not(.hidden) ~ .controls-toggle,
     .start:not(.hidden) ~ .panel,

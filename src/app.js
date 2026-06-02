@@ -101,9 +101,17 @@
       if (cameraOk && handsOk) {
         requestHandsLoop();
       } else {
-        debugEl.textContent = cameraOk ? "Hands: unavailable，已启用鼠标/触摸模式" : "Camera: unavailable，已启用鼠标/触摸模式";
+        debugEl.textContent = cameraOk ? "手势识别：不可用，已启用鼠标/触摸模式" : "摄像头：不可用，已启用鼠标/触摸模式";
       }
     });
+
+    if (tutorialSkipBtn) {
+      tutorialSkipBtn.addEventListener("click", hideTutorial);
+    }
+
+    if (tutorialNextBtn) {
+      tutorialNextBtn.addEventListener("click", advanceTutorial);
+    }
 
     flipBtn.addEventListener("click", async () => {
       facingMode = facingMode === "user" ? "environment" : "user";

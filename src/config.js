@@ -1,7 +1,7 @@
 // 应用版本和核心参数。
 // 从主逻辑中拆出，便于后续调参。
 
-const APP_VERSION = "v2026.06.02-r85";
+const APP_VERSION = "v2026.06.02-r86";
 
 const CFG = {
       cols: 44,
