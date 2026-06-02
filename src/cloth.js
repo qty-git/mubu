@@ -925,14 +925,16 @@
       }
 
       rolledPullAmount(dragY) {
-        return constrain((dragY - this.mediaRect.y) / (this.mediaRect.h * 0.38), 0, 1);
+        const divisor = this.mediaRect.h * (isMobileLayout() ? 0.30 : 0.38);
+        return constrain((dragY - this.mediaRect.y) / divisor, 0, 1);
       }
 
       shouldHideRopesFromRoll(dragY) {
         // Arm the tear-away only after the pulled point passes half of the curtain
         // height. The actual drop waits until pinch/pointer release, so it feels
         // like the user has pulled the cord off and then let go.
-        return dragY >= this.mediaRect.y + this.mediaRect.h * 0.5;
+        const ratio = isMobileLayout() ? (CFG.mobileRolledDropRatio || 0.34) : 0.5;
+        return dragY >= this.mediaRect.y + this.mediaRect.h * ratio;
       }
 
       shouldDropFromRoll(startY, dragY, vy = 0) {

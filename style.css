@@ -22,6 +22,7 @@
     }
 
     body.ui-hidden .panel,
+    body.ui-hidden .controls-toggle,
     body.ui-hidden .debug,
     body.ui-hidden .version-corner,
     body.ui-hidden .gesture-hud,
@@ -64,6 +65,7 @@
     }
 
     .start:not(.hidden) ~ .eye,
+    .start:not(.hidden) ~ .controls-toggle,
     .start:not(.hidden) ~ .panel,
     .start:not(.hidden) ~ .hint {
       opacity: 0;
@@ -319,6 +321,22 @@
       backdrop-filter: blur(12px);
     }
 
+    .controls-toggle {
+      position: fixed;
+      left: 50%;
+      bottom: max(14px, env(safe-area-inset-bottom));
+      z-index: 13;
+      display: none;
+      min-width: 82px;
+      height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: rgba(8, 10, 12, 0.58);
+      backdrop-filter: blur(16px) saturate(1.12);
+      transform: translateX(-50%);
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
     .debug {
       position: fixed;
       right: max(16px, env(safe-area-inset-right));
@@ -406,6 +424,26 @@
         border-radius: 8px;
         background: rgba(7, 9, 11, 0.72);
         box-shadow: 0 -16px 52px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+        transform: translateY(0);
+        transition: opacity 180ms ease, transform 220ms cubic-bezier(0.22, 0.72, 0.28, 1);
+      }
+
+      .controls-toggle {
+        display: inline-grid;
+        place-items: center;
+      }
+
+      body.controls-collapsed .panel {
+        transform: translateY(calc(100% + 18px));
+        pointer-events: none;
+      }
+
+      body.controls-collapsed .controls-toggle {
+        opacity: 0.92;
+      }
+
+      body:not(.controls-collapsed) .controls-toggle {
+        bottom: calc(min(62vh, calc(var(--app-height, 100dvh) - 78px)) + max(18px, env(safe-area-inset-bottom)));
       }
 
       .panel .row {
@@ -439,7 +477,13 @@
       }
 
       .panel-footer {
-        display: none;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .panel-footer .quiet {
+        width: 100%;
+        min-height: 38px;
       }
 
       .slider-row,
@@ -488,6 +532,10 @@
         right: max(10px, env(safe-area-inset-right));
         width: auto;
         max-height: min(64vh, calc(var(--app-height, 100dvh) - 74px));
+      }
+
+      body:not(.controls-collapsed) .controls-toggle {
+        bottom: calc(min(64vh, calc(var(--app-height, 100dvh) - 74px)) + max(18px, env(safe-area-inset-bottom)));
       }
 
       .row {

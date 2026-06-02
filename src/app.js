@@ -93,6 +93,10 @@
       const handsOk = await initHands();
       started = true;
       startOverlay.classList.add("hidden");
+      if (isMobileLayout() && localStorage.getItem("curtainControlsCollapsed") == null) {
+        controlsCollapsed = true;
+        updateControlsPanelUI();
+      }
       startBtn.disabled = false;
       if (cameraOk && handsOk) {
         requestHandsLoop();
@@ -132,6 +136,14 @@
       document.body.classList.toggle("ui-hidden");
       eyeBtn.textContent = document.body.classList.contains("ui-hidden") ? "◎" : "◉";
     });
+
+    if (controlsToggleBtn) {
+      controlsToggleBtn.addEventListener("click", () => {
+        controlsCollapsed = !controlsCollapsed;
+        localStorage.setItem("curtainControlsCollapsed", controlsCollapsed ? "1" : "0");
+        updateControlsPanelUI();
+      });
+    }
 
     if (debugToggleBtn) {
       debugToggleBtn.addEventListener("click", () => {

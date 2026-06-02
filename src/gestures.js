@@ -376,18 +376,20 @@
           // r49: make the real pull/drop hit area much smaller. When rolled,
           // only the visible roll line and the knots should act like a grabbable
           // curtain; the old full rectangle is reserved for two-hand scale only.
-          const rollPadX = Math.max(10, cloth.mediaRect.w * 0.025);
+          const mobile = isMobileLayout();
+          const rollPadX = Math.max(mobile ? 28 : 10, cloth.mediaRect.w * (mobile ? 0.055 : 0.025));
           const visualRollY = typeof cloth.rolledVisualY === "function" ? cloth.rolledVisualY() : cloth.mediaRect.y;
           const visualRollThickness = typeof cloth.rolledVisualThickness === "function" ? cloth.rolledVisualThickness() : Math.max(24, cloth.mediaRect.h * 0.055);
-          const rollTop = visualRollY - Math.max(10, cloth.mediaRect.h * 0.018);
-          const rollBottom = visualRollY + Math.max(24, visualRollThickness + cloth.mediaRect.h * 0.022);
+          const mobileHitHeight = cloth.mediaRect.h * (CFG.mobileRolledHitHeightRatio || 0.22);
+          const rollTop = visualRollY - Math.max(mobile ? 26 : 10, cloth.mediaRect.h * (mobile ? 0.055 : 0.018));
+          const rollBottom = visualRollY + Math.max(mobile ? 96 : 24, visualRollThickness + cloth.mediaRect.h * (mobile ? 0.16 : 0.022), mobileHitHeight);
           const inTopRollStrip =
             x >= cloth.mediaRect.x - rollPadX &&
             x <= cloth.mediaRect.x + cloth.mediaRect.w + rollPadX &&
             y >= rollTop &&
             y <= rollBottom;
 
-          const ropeRadius = Math.max(22, Math.min(58, cloth.mediaRect.w * 0.055));
+          const ropeRadius = Math.max(mobile ? 54 : 22, Math.min(mobile ? 104 : 58, cloth.mediaRect.w * (mobile ? 0.12 : 0.055)));
           const ropeHit = anchorDist <= ropeRadius;
 
           // r48: rolled curtains have two hit zones with different meanings:

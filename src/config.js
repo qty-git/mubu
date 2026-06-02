@@ -1,7 +1,7 @@
 // 应用版本和核心参数。
 // 从主逻辑中拆出，便于后续调参。
 
-const APP_VERSION = "v2026.06.02-r84";
+const APP_VERSION = "v2026.06.02-r85";
 
 const CFG = {
       cols: 44,
@@ -44,6 +44,8 @@ const CFG = {
       triMoveCooldownMs: 420,
       triMovePanGain: 1,
       triMovePanMaxStep: 58,
+      mobileRolledHitHeightRatio: 0.22,
+      mobileRolledDropRatio: 0.34,
       frostedHitPadMin: 82,
       frostedHitPadRatio: 0.22
     };

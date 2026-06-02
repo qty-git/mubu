@@ -73,7 +73,16 @@
       if (greenScreenBtn) greenScreenBtn.classList.toggle("is-active", greenScreenEnabled);
       if (modeBtn) modeBtn.classList.toggle("is-active", dragMode);
       if (sizeTargetBtn) sizeTargetBtn.classList.toggle("is-active", sizeAllCurtains);
+      updateControlsPanelUI();
       updateDebugModeUI();
+    }
+
+    function updateControlsPanelUI() {
+      document.body.classList.toggle("controls-collapsed", Boolean(controlsCollapsed));
+      if (controlsToggleBtn) {
+        controlsToggleBtn.textContent = controlsCollapsed ? "控制" : "收起";
+        controlsToggleBtn.classList.toggle("is-active", !controlsCollapsed);
+      }
     }
 
     function updateDebugModeUI() {
