@@ -75,8 +75,9 @@
             vy: 0,
             pinchFrames: 0,
             releaseFrames: 0,
-            fistFrames: 0,
-            fistReleaseFrames: 0,
+            triMoveFrames: 0,
+            triMoveReleaseFrames: 0,
+            pinchCooldownUntil: 0,
             pinching: false
           };
         } else {
@@ -84,7 +85,8 @@
         }
 
         const wasPinching = best.pinching;
-        const wasFisting = best.fisting;
+        const wasTriMoving = best.triMoving;
+        const now = performance.now();
         best.prevX = best.x;
         best.prevY = best.y;
         best.x = hand.x;
@@ -97,12 +99,19 @@
         best.palmY = hand.palmY;
         best.palmSize = hand.palmSize;
         best.palmOpen = hand.palmOpen;
-        best.fistClosed = hand.fistClosed;
+        best.triPinch = hand.triPinch;
+        best.triX = hand.triX;
+        best.triY = hand.triY;
+        best.triRatio = hand.triRatio;
         const handSpeed = Math.hypot(best.vx, best.vy);
-        // r34: avoid single-frame false pinches from a fast moving fist.
+        const triLooksReal = hand.triPinch &&
+          hand.triRatio < (wasTriMoving ? (CFG.triMoveOffRatio || 0.42) : (CFG.triMoveOnRatio || 0.30)) &&
+          hand.triAbs < (CFG.triMoveOnAbs || 0.085) * (wasTriMoving ? 1.35 : 1) &&
+          now > (best.pinchCooldownUntil || 0);
+        // r34: avoid single-frame false pinches from fast hand motion.
         // A new pinch must be both relatively small and absolutely close for a few frames.
-        const pinchLooksReal = hand.ratio < CFG.pinchOnRatio && hand.absDist < CFG.pinchOffAbs;
-        const pinchStillValid = hand.ratio < CFG.pinchOffRatio && hand.absDist < CFG.pinchOffAbs * 1.18;
+        const pinchLooksReal = !triLooksReal && hand.ratio < CFG.pinchOnRatio && hand.absDist < CFG.pinchOffAbs;
+        const pinchStillValid = !triLooksReal && hand.ratio < CFG.pinchOffRatio && hand.absDist < CFG.pinchOffAbs * 1.18;
         if (wasPinching ? pinchStillValid : pinchLooksReal) {
           best.pinchFrames = (best.pinchFrames || 0) + 1;
           best.releaseFrames = 0;
@@ -114,22 +123,23 @@
           best.pinching = best.pinchFrames >= CFG.pinchConfirmFrames && handSpeed < CFG.maxPinchStartSpeed;
         } else if (best.releaseFrames >= CFG.pinchReleaseFrames) {
           best.pinching = false;
+          best.pinchCooldownUntil = now + (CFG.triMoveCooldownMs || 420);
         }
 
-        if (!best.pinching && hand.fistClosed) {
-          best.fistFrames = (best.fistFrames || 0) + 1;
-          best.fistReleaseFrames = 0;
+        if (!best.pinching && triLooksReal) {
+          best.triMoveFrames = (best.triMoveFrames || 0) + 1;
+          best.triMoveReleaseFrames = 0;
         } else {
-          best.fistReleaseFrames = (best.fistReleaseFrames || 0) + 1;
-          best.fistFrames = 0;
+          best.triMoveReleaseFrames = (best.triMoveReleaseFrames || 0) + 1;
+          best.triMoveFrames = 0;
         }
-        if (!wasFisting) {
-          best.fisting = best.fistFrames >= (CFG.fistConfirmFrames || 3) && handSpeed < (CFG.fistMaxStartSpeed || 72);
-        } else if (best.pinching || best.fistReleaseFrames >= (CFG.fistReleaseFrames || 4)) {
-          best.fisting = false;
+        if (!wasTriMoving) {
+          best.triMoving = best.triMoveFrames >= (CFG.triMoveConfirmFrames || 4) && handSpeed < (CFG.triMoveMaxStartSpeed || 42);
+        } else if (best.pinching || best.triMoveReleaseFrames >= (CFG.triMoveReleaseFrames || 5)) {
+          best.triMoving = false;
         }
         best.wasPinching = wasPinching;
-        best.wasFisting = wasFisting;
+        best.wasTriMoving = wasTriMoving;
         currentHandIds.add(best.id);
         if (best.pinching) currentPinchIds.add(best.id);
         next.push(best);
@@ -139,20 +149,20 @@
         if (!next.find((item) => item.id === track.id) && grabs.has(track.id)) {
           releaseGrab(track.id, track.vx || 0, track.vy || 0, track.x || stageW() / 2, track.y || stageH() / 2);
         }
-        if (!next.find((item) => item.id === track.id) && fistMoves.has(track.id)) {
-          releaseFistMove(track.id);
+        if (!next.find((item) => item.id === track.id) && handMoves.has(track.id)) {
+          releaseHandMove(track.id);
         }
       }
 
       for (const hand of next) {
-        const moveX = hand.palmX ?? hand.x;
-        const moveY = hand.palmY ?? hand.y;
+        const moveX = hand.triX ?? hand.palmX ?? hand.x;
+        const moveY = hand.triY ?? hand.palmY ?? hand.y;
         if (!hand.wasPinching && hand.pinching) startGrab(hand.id, hand.x, hand.y);
         if (hand.pinching) moveGrab(hand.id, hand.x, hand.y, hand.vx, hand.vy);
         if (hand.wasPinching && !hand.pinching) releaseGrab(hand.id, hand.vx, hand.vy, hand.x, hand.y);
-        if (!hand.wasFisting && hand.fisting) startFistMove(hand.id, moveX, moveY);
-        if (hand.fisting) moveFistMove(hand.id, moveX, moveY);
-        if (hand.wasFisting && !hand.fisting) releaseFistMove(hand.id);
+        if (!hand.wasTriMoving && hand.triMoving) startHandMove(hand.id, moveX, moveY);
+        if (hand.triMoving) moveHandMove(hand.id, moveX, moveY);
+        if (hand.wasTriMoving && !hand.triMoving) releaseHandMove(hand.id);
       }
       if (currentPinchIds.size < 2 && dualHandScale) updateDualHandScale();
 
@@ -168,22 +178,35 @@
         scaleHands: dualHandScale && dualHandScale.active ? 2 : 0,
         lastFrameAt: performance.now(),
         palms: next.filter((item) => item.palmOpen && !item.pinching).length,
-        fists: next.filter((item) => item.fisting).length
+        triMoves: next.filter((item) => item.triMoving).length
       };
     }
     function handFromLandmarks(lm) {
       const thumb = lm[4];
       const index = lm[8];
+      const middle = lm[12];
+      const ring = lm[16];
+      const pinky = lm[20];
       const wrist = lm[0];
       const middleBase = lm[9];
       const sx = mirrorCamera ? 1 - (thumb.x + index.x) * 0.5 : (thumb.x + index.x) * 0.5;
       const sy = (thumb.y + index.y) * 0.5;
       const tx = mirrorCamera ? 1 - thumb.x : thumb.x;
       const ix = mirrorCamera ? 1 - index.x : index.x;
+      const mx = mirrorCamera ? 1 - middle.x : middle.x;
+      const rx = mirrorCamera ? 1 - ring.x : ring.x;
+      const kx = mirrorCamera ? 1 - pinky.x : pinky.x;
       const sw = stageW();
       const sh = stageH();
       const thumbIndexPx = Math.hypot((tx - ix) * sw, (thumb.y - index.y) * sh);
       const palmPx = Math.max(1, Math.hypot((wrist.x - middleBase.x) * sw, (wrist.y - middleBase.y) * sh));
+      const thumbMiddlePx = Math.hypot((tx - mx) * sw, (thumb.y - middle.y) * sh);
+      const indexMiddlePx = Math.hypot((ix - mx) * sw, (index.y - middle.y) * sh);
+      const triClusterPx = Math.max(thumbIndexPx, thumbMiddlePx, indexMiddlePx);
+      const triCx = (tx + ix + mx) / 3;
+      const triCy = (thumb.y + index.y + middle.y) / 3;
+      const ringAwayPx = Math.hypot((rx - triCx) * sw, (ring.y - triCy) * sh);
+      const pinkyAwayPx = Math.hypot((kx - triCx) * sw, (pinky.y - triCy) * sh);
 
       const palmIndices = [0, 5, 9, 13, 17];
       let px = 0;
@@ -242,9 +265,18 @@
       }
       const palmOpen = extended >= 3;
       const fistClosed = curled >= 3 && extended <= 1;
+      const triRatio = triClusterPx / palmPx;
+      const triAbs = triClusterPx / Math.min(sw, sh);
+      const spareFingersAway = Math.min(ringAwayPx, pinkyAwayPx) / palmPx > 0.42;
+      const triPinch = triRatio < (CFG.triMoveOffRatio || 0.42) &&
+        triAbs < (CFG.triMoveOnAbs || 0.085) * 1.35 &&
+        spareFingersAway &&
+        !fistClosed;
       return {
         x: sx * sw,
         y: sy * sh,
+        triX: triCx * sw,
+        triY: triCy * sh,
         palmX: px * sw,
         palmY: py * sh,
         palmSize: palmPx,
@@ -252,7 +284,9 @@
         palmEraseDiameter,
         handBoxSize,
         palmOpen,
-        fistClosed,
+        triPinch,
+        triRatio,
+        triAbs,
         ratio: thumbIndexPx / palmPx,
         absDist: thumbIndexPx / Math.min(sw, sh)
       };

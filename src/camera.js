@@ -73,18 +73,8 @@
       // r64: green screen applies only to the curtain/media display region,
       // not to the whole camera background. Keep the real camera background visible.
       if (cameraVideo.readyState >= 2) {
-        const mobile = isMobileLayout();
-        if (mobile) {
-          ctx.globalAlpha = 0.34;
-          ctx.filter = "blur(16px) saturate(0.82)";
-          drawCover(cameraVideo, 0, 0, stageW(), stageH(), mirrorCamera);
-          ctx.filter = "none";
-          ctx.globalAlpha = 0.98;
-          drawContain(cameraVideo, 0, 0, stageW(), stageH(), mirrorCamera);
-        } else {
-          ctx.globalAlpha = 0.96;
-          drawCover(cameraVideo, 0, 0, stageW(), stageH(), mirrorCamera);
-        }
+        ctx.globalAlpha = 0.96;
+        drawStageCamera();
       } else {
         ctx.fillStyle = "#111418";
         ctx.fillRect(0, 0, stageW(), stageH());

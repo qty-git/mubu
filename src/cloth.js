@@ -33,15 +33,13 @@
         layerCtx.translate(-rect.x, -rect.y);
         const sw = cameraVideo.videoWidth || cameraVideo.width || 1;
         const sh = cameraVideo.videoHeight || cameraVideo.height || 1;
-        const x = -8;
-        const y = -5;
-        const w = stageW() + 16;
-        const h = stageH() + 10;
-        const coverScale = Math.max(w / sw, h / sh);
+        const x = 0;
+        const y = 0;
+        const coverScale = Math.max(stageW() / sw, stageH() / sh);
         const dw = sw * coverScale;
         const dh = sh * coverScale;
-        const dx = x + (w - dw) / 2;
-        const dy = y + (h - dh) / 2;
+        const dx = x + (stageW() - dw) / 2;
+        const dy = y + (stageH() - dh) / 2;
         if (mirrorCamera) {
           const mirrorW = stageW();
           layerCtx.translate(mirrorW, 0);
@@ -549,7 +547,7 @@
 
         if (cameraVideo.readyState >= 2) {
           context.globalAlpha = 1;
-          drawCover(cameraVideo, -8, -5, stageW() + 16, stageH() + 10, mirrorCamera);
+          drawStageCamera();
         }
 
         const stress = this.visualStress();
@@ -592,7 +590,7 @@
         if (hasCamera) {
           context.save();
           context.filter = `blur(${FROST_CFG.blur}px) saturate(0.88) contrast(1.03)`;
-          drawCover(cameraVideo, -8, -5, stageW() + 16, stageH() + 10, mirrorCamera);
+          drawStageCamera();
           context.restore();
         } else {
           context.fillStyle = "rgba(210,220,225,0.22)";

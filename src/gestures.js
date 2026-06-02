@@ -198,13 +198,13 @@
       );
     }
 
-    function startFistMove(id, x, y) {
+    function startHandMove(id, x, y) {
       if (dualHandScale || grabs.size > 0) return;
       const cloth = coverMode === "frosted" ? findFrostedOverlayAt(x, y, "move") : findClothAt(x, y);
       if (!cloth) return;
       selectedCloth = cloth;
       curtainSizeInput.value = selectedCloth.scale.toFixed(2);
-      fistMoves.set(id, {
+      handMoves.set(id, {
         id,
         x,
         y,
@@ -214,11 +214,11 @@
       cloth.settleStart = Infinity;
     }
 
-    function moveFistMove(id, x, y) {
-      const move = fistMoves.get(id);
+    function moveHandMove(id, x, y) {
+      const move = handMoves.get(id);
       if (!move || !move.cloth) return;
-      const gain = CFG.fistPanGain || 1;
-      const maxStep = CFG.fistPanMaxStep || 64;
+      const gain = CFG.triMovePanGain || 1;
+      const maxStep = CFG.triMovePanMaxStep || 58;
       const dx = constrain((x - move.x) * gain, -maxStep, maxStep);
       const dy = constrain((y - move.y) * gain, -maxStep, maxStep);
       move.x = x;
@@ -230,10 +230,10 @@
       curtainSizeInput.value = selectedCloth.scale.toFixed(2);
     }
 
-    function releaseFistMove(id) {
-      const move = fistMoves.get(id);
+    function releaseHandMove(id) {
+      const move = handMoves.get(id);
       if (move && move.cloth) move.cloth.settleStart = performance.now();
-      fistMoves.delete(id);
+      handMoves.delete(id);
     }
 
     function startGrab(id, x, y) {

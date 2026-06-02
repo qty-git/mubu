@@ -112,6 +112,9 @@
       }
       ctx.restore();
     }
+    function drawStageCamera(x = 0, y = 0, w = stageW(), h = stageH()) {
+      drawCover(cameraVideo, x, y, w, h, mirrorCamera);
+    }
     function mediaReady(el) {
       if (!el) return false;
       if (el instanceof HTMLVideoElement) return el.readyState >= 2;

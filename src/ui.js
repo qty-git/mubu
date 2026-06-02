@@ -24,7 +24,7 @@
 ` +
         `Palm: ${lastDebug.palms || 0}
 ` +
-        `FistMove: ${lastDebug.fists || fistMoves.size || 0}
+        `TriMove: ${lastDebug.triMoves || handMoves.size || 0}
 ` +
         `Cover: ${COVER_MODES[coverMode] || coverMode}
 ` +
@@ -55,7 +55,7 @@
         `curtains: ${cloths.length}\n` +
         `selected: ${selectedCloth ? selectedCloth.id.slice(-3) : "-"} ${selectedCloth && selectedCloth.hung ? "hung" : ""}\n` +
         `mode: ${dragMode ? "move" : "cloth"}\n` +
-        `grabs: ${grabs.size + (pointerGrab ? 1 : 0)}  fists: ${fistMoves.size}`;
+        `grabs: ${grabs.size + (pointerGrab ? 1 : 0)}  triMoves: ${handMoves.size}`;
     }
 
     function updateCoverModeUI() {

@@ -153,7 +153,7 @@
         // r63: frosted mode is a strict overlay mode, not a physical curtain.
         // Clear active cloth grabs so it cannot be pinched/opened.
         grabs.clear();
-        fistMoves.clear();
+        handMoves.clear();
         pointerGrab = null;
         moveDrag = null;
         dualHandScale = null;
@@ -283,7 +283,7 @@
       }
       selectedCloth = cloths[0] || null;
       grabs.clear();
-      fistMoves.clear();
+      handMoves.clear();
       pointerGrab = null;
       moveDrag = null;
     }
@@ -316,9 +316,11 @@
         return age > 120 && speed < CFG.dualScaleMaxStartSpeed;
       });
       if (active.length < 2) return null;
+      const minPairDistance = Math.max(CFG.dualScaleMinHandDistance || 120, Math.min(stageW(), stageH()) * 0.20);
       for (let i = 0; i < active.length - 1; i++) {
         for (let j = i + 1; j < active.length; j++) {
-          if (active[i].cloth === active[j].cloth) return [active[i], active[j]];
+          const d = Math.hypot(active[i].x - active[j].x, active[i].y - active[j].y);
+          if (active[i].cloth === active[j].cloth && d >= minPairDistance) return [active[i], active[j]];
         }
       }
       return null;

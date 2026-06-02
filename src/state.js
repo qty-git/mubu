@@ -63,7 +63,7 @@ const cameraVideo = document.getElementById("cameraVideo");
     let currentPinchIds = new Set();
     let nextHandId = 1;
     let grabs = new Map();
-    let fistMoves = new Map();
+    let handMoves = new Map();
     let pointerGrab = null;
     let moveDrag = null;
     let pointerDown = false;
@@ -76,7 +76,7 @@ const cameraVideo = document.getElementById("cameraVideo");
       scaleHands: 0,
       lastFrameAt: 0,
       palms: 0,
-      fists: 0
+      triMoves: 0
     };
     let dualHandScale = null;
     let lastHudUpdateAt = 0;

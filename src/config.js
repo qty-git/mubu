@@ -1,7 +1,7 @@
 // 应用版本和核心参数。
 // 从主逻辑中拆出，便于后续调参。
 
-const APP_VERSION = "v2026.06.02-r83";
+const APP_VERSION = "v2026.06.02-r84";
 
 const CFG = {
       cols: 44,
@@ -21,8 +21,9 @@ const CFG = {
       pinchConfirmFrames: 2,
       pinchReleaseFrames: 5,
       maxPinchStartSpeed: 62,
-      dualScaleConfirmFrames: 4,
-      dualScaleDeadZone: 22,
+      dualScaleConfirmFrames: 6,
+      dualScaleDeadZone: 34,
+      dualScaleMinHandDistance: 120,
       dualScaleMaxStartSpeed: 38,
       // 双手缩放速度增益：拉开/合拢越快，虚拟缩放距离越大，
       // 这样不用把手移动很远也能放大到最大。
@@ -34,11 +35,15 @@ const CFG = {
       dualPanDeadZone: 10,
       dualPanGain: 0.92,
       dualPanMaxStep: 58,
-      fistConfirmFrames: 3,
-      fistReleaseFrames: 4,
-      fistMaxStartSpeed: 72,
-      fistPanGain: 1,
-      fistPanMaxStep: 64,
+      triMoveConfirmFrames: 4,
+      triMoveReleaseFrames: 5,
+      triMoveMaxStartSpeed: 42,
+      triMoveOnRatio: 0.30,
+      triMoveOffRatio: 0.42,
+      triMoveOnAbs: 0.085,
+      triMoveCooldownMs: 420,
+      triMovePanGain: 1,
+      triMovePanMaxStep: 58,
       frostedHitPadMin: 82,
       frostedHitPadRatio: 0.22
     };
